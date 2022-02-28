@@ -1,5 +1,5 @@
 /**
- * This is a mock function, that GenericPAy calls. It will call the Westpac Quickstream API to
+ * This is a mock function, that GenericPay calls. It will call the Westpac Quickstream API to
  * get a SUT.
  * 
  * NB: This is NOT PCI DSS compliant and should NEVER be used in production or with real credit cards.
@@ -28,14 +28,23 @@ const axios = require('axios');
 
 exports.handler = async function (context, event, callback) {
 
-    // console.log(`cardnumber: ${event.cardnumber}, expiry_month: ${event.expiry_month}, expiry_year: ${event.expiry_year}, cvv: ${event.cvv}`);
+    console.dir(event);
+
+    console.log(`cardnumber: ${event.cardnumber}, expiry_month: ${event.expiry_month}, expiry_year: ${event.expiry_year}, cvv: ${event.cvv}`);
+
+    var expiry_year_normalised;
+    if (event.expiry_year.length === 2) {
+        expiry_year_normalised = '20' + event.expiry_year;
+    } else {
+        expiry_year_normalised = event.expiry_year;
+    }
 
     var data = JSON.stringify({
         "accountType": "CREDIT_CARD",
         "cardholderName": "Rest Test",
         "cardNumber": event.cardnumber,
         "expiryDateMonth": event.expiry_month,
-        "expiryDateYear": event.expiry_year,
+        "expiryDateYear": expiry_year_normalised,
         "cvn": event.cvv,
         "supplierBusinessCode": context.SUPPLIER_BUSINESS_CODE,
     });
@@ -58,8 +67,29 @@ exports.handler = async function (context, event, callback) {
 
     try {
         const response = await axios(config);
-        console.log(JSON.stringify(response.data));
-        return callback(null, response.data);
+        // Map the response parameters to the Twilo response format
+
+        console.dir(response.data);
+
+        var twilio_response = {
+            "PaymentCardNumber": "xxxxxxxxxxxx" + event.cardnumber.substring(event.cardnumber.length - 4),
+            "PaymentConfirmationCode": "",
+            "ProfileId": "",
+            "PaymentCardType": response.data.creditCard.cardScheme.toLowerCase(),
+            "DateUpdated": Date.now(),
+            "AccountSid": context.AccountSid,
+            "Result": "success",
+            "Sid": "",
+            "ExpirationDate": event.expiry_month + event.expiry_year,
+            "PaymentMethod": "credit-card",
+            "CallSid": event.callSid,
+            "PaymentToken": response.data.singleUseTokenId,
+            "SecurityCode": "xxx"
+        }
+
+
+        console.log(JSON.stringify(twilio_response));
+        return callback(null, twilio_response);
 
     } catch (error) {
         console.log(error);
