@@ -67,28 +67,16 @@ exports.handler = async function (context, event, callback) {
 
     try {
         const response = await axios(config);
-        // Map the response parameters to the Twilo response format
-
         console.dir(response.data);
 
-        var twilio_response = {
-            "PaymentCardNumber": "xxxxxxxxxxxx" + event.cardnumber.substring(event.cardnumber.length - 4),
-            "PaymentConfirmationCode": "",
-            "ProfileId": "",
-            "PaymentCardType": response.data.creditCard.cardScheme.toLowerCase(),
-            "DateUpdated": Date.now(),
-            "AccountSid": context.AccountSid,
-            "Result": "success",
-            "Sid": "",
-            "ExpirationDate": event.expiry_month + event.expiry_year,
-            "PaymentMethod": "credit-card",
-            "CallSid": event.callSid,
-            "PaymentToken": response.data.singleUseTokenId,
-            "SecurityCode": "xxx"
-        }
+        // Map the response parameters to the Twilio Pay response format
+        var twilio_response =
+        {
+            "token_id": response.data.singleUseTokenId,
+            "error_code": null,
+            "error_message": null
+        };
 
-
-        console.log(JSON.stringify(twilio_response));
         return callback(null, twilio_response);
 
     } catch (error) {
