@@ -46,7 +46,7 @@ exports.handler = async function (context, event, callback) {
         "expiryDateMonth": event.expiry_month,
         "expiryDateYear": expiry_year_normalised,
         "cvn": event.cvv,
-        "supplierBusinessCode": context.SUPPLIER_BUSINESS_CODE,
+        "supplierBusinessCode": event.SBC,     //context.SUPPLIER_BUSINESS_CODE,
     });
 
     const username = context.PUBLISHABLE_API_KEY;
