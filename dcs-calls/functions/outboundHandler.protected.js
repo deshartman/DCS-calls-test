@@ -16,6 +16,7 @@ exports.handler = function (context, event, callback) {
 
     // Extract the UUI in the parent call leg (PBX to Twilio). The PSTN side call SID will be in the callback body.
     //let uui = event["SipHeader_User-to-User"];
+
     let guid = event["SipHeader_x-inin-cnv"];    // This is the header Genesys will use
 
     if (!guid) {
