@@ -9,7 +9,8 @@ exports.handler = async function (context, event, callback) {
     console.log("Received the following data: " + JSON.stringify(event, null, 4));
 
     console.log(`outboundLog PSTN Call SID: ${event.CallSid}`);
-    console.log(`outboundLog UUI: ${event.uui}`);
+    onsole.log(`outboundLog UUI: ${event.data.guid}`);
+    console.log(`outboundLog UUI: ${event.data.uui}`);
 
 
     return callback(null, event);
