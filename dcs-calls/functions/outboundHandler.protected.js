@@ -25,7 +25,12 @@ exports.handler = function (context, event, callback) {
 
     try {
         // console.log(`Dialing ${to} with Caller ID ${from} - Was to:${event.To} from:${event.From}`);
-        const dial = voiceResponse.dial({ callerId: from });
+        const dial = voiceResponse.dial(
+            {
+                callerId: from,
+                referUrl: "/referHandler",  // Refer handler to PSTN if needed
+            }
+        );
         dial.number(
             {
                 // Only update when call is answered

@@ -14,7 +14,9 @@ exports.handler = async function (context, event, callback) {
         const sipTo = event.To + '@' + context.SIP_DOMAIN + '?' + 'User-to-User=' + event.CallSid;
 
         // Dial SIP URL
-        voiceResponse.dial().sip(sipTo);
+        voiceResponse.dial({
+            referUrl: "/referHandler",  // Refer handler to PSTN if needed
+        }).sip(sipTo);
         return callback(null, voiceResponse);
     } catch (error) {
         // Some other error occurred
@@ -22,5 +24,17 @@ exports.handler = async function (context, event, callback) {
     }
 };
 
+
+
+/**
+ * Generic SIP REFER handler in the dial to PBX
+ * 
+const voiceResponse = new VoiceResponse();
+voiceResponse.dial({
+    referUrl: "https://example.com/handler",
+}).sip(sipTo);
+
+console.log(voiceResponse.toString());
+*/
 
 
